@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2018 Arthur Aslanyan -->
+<component type="desktop">
+    <id>com.github.asahnoln.elementary-looper</id>
+    <metadata_license>CC0</metadata_license>
+    <name>Looper</name>
+    <summary>Loop Everything</summary>
+    <description>
+        <p>A small looper app which allows to create loops and overdubs with your microphone.</p>
+    </description>
+    <custom>
+     <value key="x-appcenter-color-primary">#603461</value>
+     <value key="x-appcenter-color-primary-text">rgb(255, 255, 255)</value>
+     <value key="x-appcenter-suggested-price">5</value>
+  </custom>
+</component>

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Looper
+GenericName=Looper App
+Comment=Allows making microphone loops
+Categories=Utility;Audio;
+Exec=com.github.asahnoln.elementary-looper
+Icon=application-default-icon
+Terminal=false
+Type=application
+Keywords=Looper;Microphone;
