@@ -31,15 +31,36 @@ public class Looper : Gtk.Application {
         main_window.default_height = 200;
         main_window.title = _("Looper");
 
+        // TODO: Loops storage
+
         var grid = new Gtk.Grid ();
         grid.orientation = Gtk.Orientation.HORIZONTAL;
         
-        var start_button = new Gtk.Button.with_label (_("Start"));
+        // Button labels mean COMMANDS to do, not STATES
+        // Arguable?
+
+        var start_button = new Gtk.Button.with_label (_("Rec"));
         start_button.clicked.connect(() => {
-            start_button.label = start_button.label == _("Start") ? _("Overdub") : _("Start");
+            // Primitive phases
+            start_button.label = start_button.label == _("Rec") || start_button.label == _("Overdub")
+                ? _("Play") // Record sound
+                : _("Overdub"); // Play sound
+
+            // TODO: Record and play sound
+
+            // Limit to 5 minutes
+            // Save in memory? On disk? 
+            // I think it's better to work with current loop in memory and store other loops on disk
         });
 
         var stop_button = new Gtk.Button.with_label (_("Stop"));
+        stop_button.clicked.connect(() => {
+            start_button.label = _("Play");
+        });
+
+        // TODO: Add erase button
+        // TODO: Add STATUS indicator
+        // TODO: Change button labels with icons
 
         grid.add (stop_button);
         grid.add (start_button);

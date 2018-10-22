@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.asahnoln.elementary-looper\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-23 04:09+0600\n"
+"POT-Creation-Date: 2018-10-23 04:27+0600\n"
 "PO-Revision-Date: 2018-10-23 04:07+0600\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -16,21 +16,25 @@ msgstr ""
 "Content-Type: text/plain; charset=ASCII\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/Application.vala:14
+#: src/Application.vala:32
 #: data/com.github.asahnoln.elementary-looper.in.desktop:3
 #: data/com.github.asahnoln.elementary-looper.in.appdata.xml:6
 msgid "Looper"
 msgstr ""
 
-#: src/Application.vala:19 src/Application.vala:21
-msgid "Start"
+#: src/Application.vala:41 src/Application.vala:44
+msgid "Rec"
 msgstr ""
 
-#: src/Application.vala:21
+#: src/Application.vala:44 src/Application.vala:46
 msgid "Overdub"
 msgstr ""
 
-#: src/Application.vala:24
+#: src/Application.vala:45 src/Application.vala:57
+msgid "Play"
+msgstr ""
+
+#: src/Application.vala:55
 msgid "Stop"
 msgstr ""
 
