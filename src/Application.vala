@@ -1,4 +1,4 @@
-// Copyright (C) 2018 Arthur Aslanyan
+// Copyright (C) 2020 Arthur Aslanyan
 // 
 // This file is part of looper.
 // 
@@ -17,14 +17,54 @@
 // 
 
 public class Looper : Gtk.Application {
+    private ushort state { get; set; default = 0; }
+    private bool has_song { get; set; default = false; }
+
+    enum StateType {
+        STATE_STOPPED,
+        STATE_RECORDING,
+        STATE_PLAYING,
+        STATE_OVERDUBBING
+    }
+
     public Looper () {
         Object(
-            application_id: "com.github.asahnoln.elementary-looper",
+            application_id: "com.github.asahnoln.audiolooper",
             flags: ApplicationFlags.FLAGS_NONE
         );
     }
 
     protected override void activate () {
+        
+        // Audio
+        
+        /* Initialize GStreamer */
+        //  Gst.gst_init (/*&argc, &argv*/);
+        
+        /* Build the pipeline */
+        //  var pipeline =
+            //  Gst.gst_parse_launch
+            //  ("playbin uri=https://www.freedesktop.org/software/gstreamer-sdk/data/media/sintel_trailer-480p.webm",
+            //  NULL);
+
+        /* Start playing */
+        //  Gst.gst_element_set_state (pipeline, Gst.GST_STATE_PLAYING);
+
+        /* Wait until error or EOS */
+        //  var bus = Gst.gst_element_get_bus (pipeline);
+        //  var msg =
+            //  Gst.gst_bus_timed_pop_filtered (bus, Gst.GST_CLOCK_TIME_NONE,
+            //  Gst.GST_MESSAGE_ERROR | Gst.GST_MESSAGE_EOS);
+
+        /* Free resources */
+        //  if (msg != NULL) {
+            //  Gst.gst_message_unref (msg);
+        //  }
+        //  Gst.gst_object_unref (bus);
+        //  Gst.gst_element_set_state (pipeline, Gst.GST_STATE_NULL);
+        //  Gst.gst_object_unref (pipeline);
+
+        // Grid
         var main_window = new Gtk.ApplicationWindow (this);
 
         main_window.default_width = 200;
@@ -33,18 +73,27 @@ public class Looper : Gtk.Application {
 
         // TODO: Loops storage
 
-        var grid = new Gtk.Grid ();
-        grid.orientation = Gtk.Orientation.HORIZONTAL;
+        var layout = new Gtk.Grid ();
+        //  grid.orientation = Gtk.Orientation.HORIZONTAL;
+        layout.column_spacing = 6;
+        layout.row_spacing = 6;
         
         // Button labels mean COMMANDS to do, not STATES
         // Arguable?
+        
 
         var start_button = new Gtk.Button.with_label (_("Rec"));
         start_button.clicked.connect(() => {
             // Primitive phases
-            start_button.label = start_button.label == _("Rec") || start_button.label == _("Overdub")
-                ? _("Play") // Record sound
-                : _("Overdub"); // Play sound
+            state = state == StateType.STATE_RECORDING || state == StateType.STATE_OVERDUBBING
+                ? StateType.STATE_PLAYING // Record sound
+                : StateType.STATE_OVERDUBBING // Play sound
+            ;
+
+            debug("Button clicked!");
+
+            debug(state.to_string ());
+
 
             // TODO: Record and play sound
 
@@ -54,18 +103,53 @@ public class Looper : Gtk.Application {
         });
 
         var stop_button = new Gtk.Button.with_label (_("Stop"));
+        stop_button.sensitive = false;
         stop_button.clicked.connect(() => {
-            start_button.label = _("Play");
+            //start_button.label = _("Play");
+            if (state == StateType.STATE_STOPPED) {
+                has_song = false;
+            }
         });
 
-        // TODO: Add erase button
+        //  notify.connect((s, p) => {
+        //      debug("Property changed! %s", p.name);
+        //      switch (state) {
+        //          case StateType.STATE_STOPPED:
+        //              if (has_song) {
+        //                  start_button.label = _("Play");
+        //                  stop_button.label = _("Erase");
+        //              } else {
+        //                  start_button.label = _("Rec");
+        //                  stop_button.label = _("Stop");
+        //                  stop_button.sensitive = false;
+        //              }
+        //              break;
+        //          case StateType.STATE_RECORDING:
+        //              start_button.label = _("Play");
+        //              stop_button.label = _("Stop");
+        //              stop_button.sensitive = true;
+        //              has_song = true;
+        //              break;
+        //          case StateType.STATE_PLAYING:
+        //              start_button.label = _("Overdub");
+        //              stop_button.sensitive = true;
+        //              break;
+        //          case StateType.STATE_OVERDUBBING:
+        //              start_button.label = _("Play");
+        //              break;
+        //      }
+        //  });
+
         // TODO: Add STATUS indicator
         // TODO: Change button labels with icons
 
-        grid.add (stop_button);
-        grid.add (start_button);
+        //  start_button.margin = 12;
+        //  stop_button.margin = 12;
 
-        main_window.add (grid);
+        layout.attach (stop_button, 0, 0, 1, 1);
+        layout.attach_next_to (start_button, stop_button, Gtk.PositionType.RIGHT, 1, 1);
+
+        main_window.add (layout);
         main_window.show_all ();
     }
 

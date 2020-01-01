@@ -1,10 +1,11 @@
 [Desktop Entry]
-Name=Looper
-GenericName=Looper App
+Name=Audio Looper
+GenericName=Audio Looper App
 Comment=Allows making microphone loops
 Categories=Utility;Audio;
-Exec=com.github.asahnoln.elementary-looper
+Exec=com.github.asahnoln.audiolooper
 Icon=application-default-icon
 Terminal=false
 Type=application
 Keywords=Looper;Microphone;
+X-GNOME-UsesNotifications=true
