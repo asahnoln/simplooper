@@ -33,7 +33,7 @@ public class Looper : Gtk.Application {
 
     public Looper () {
         Object(
-            application_id: "com.github.asahnoln.audiolooper",
+            application_id: "com.github.asahnoln.simplooper",
             flags: ApplicationFlags.FLAGS_NONE
         );
     }

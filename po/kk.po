@@ -16,8 +16,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/Application.vala:72 data/com.github.asahnoln.audiolooper.in.desktop:3
-#: data/com.github.asahnoln.audiolooper.in.appdata.xml:6
+#: src/Application.vala:72 data/com.github.asahnoln.simplooper.in.desktop:3
+#: data/com.github.asahnoln.simplooper.in.appdata.xml:6
 msgid "Audio Looper"
 msgstr ""
 
@@ -29,27 +29,27 @@ msgstr ""
 msgid "Stop"
 msgstr ""
 
-#: data/com.github.asahnoln.audiolooper.in.desktop:4
+#: data/com.github.asahnoln.simplooper.in.desktop:4
 msgid "Audio Looper App"
 msgstr ""
 
-#: data/com.github.asahnoln.audiolooper.in.desktop:5
+#: data/com.github.asahnoln.simplooper.in.desktop:5
 msgid "Allows making microphone loops"
 msgstr ""
 
-#: data/com.github.asahnoln.audiolooper.in.desktop:8
+#: data/com.github.asahnoln.simplooper.in.desktop:8
 msgid "application-default-icon"
 msgstr ""
 
-#: data/com.github.asahnoln.audiolooper.in.desktop:11
+#: data/com.github.asahnoln.simplooper.in.desktop:11
 msgid "Looper;Microphone;"
 msgstr ""
 
-#: data/com.github.asahnoln.audiolooper.in.appdata.xml:7
+#: data/com.github.asahnoln.simplooper.in.appdata.xml:7
 msgid "Loop Everything"
 msgstr ""
 
-#: data/com.github.asahnoln.audiolooper.in.appdata.xml:9
+#: data/com.github.asahnoln.simplooper.in.appdata.xml:9
 msgid ""
 "A small looper app which allows to create loops and overdubs with your "
 "microphone."

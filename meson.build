@@ -1,4 +1,4 @@
-project('com.github.asahnoln.audiolooper', 'vala', 'c')
+project('com.github.asahnoln.simplooper', 'vala', 'c')
 
 i18n = import('i18n')
 

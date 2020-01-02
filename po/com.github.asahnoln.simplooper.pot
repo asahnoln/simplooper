@@ -1,14 +1,14 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the com.github.asahnoln.audiolooper package.
+# This file is distributed under the same license as the com.github.asahnoln.simplooper package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: com.github.asahnoln.audiolooper\n"
+"Project-Id-Version: com.github.asahnoln.simplooper\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-02 21:31+0600\n"
+"POT-Creation-Date: 2020-01-02 22:06+0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,8 +17,8 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/Application.vala:94 data/com.github.asahnoln.audiolooper.in.desktop:3
-#: data/com.github.asahnoln.audiolooper.in.appdata.xml:6
+#: src/Application.vala:94 data/com.github.asahnoln.simplooper.in.desktop:4
+#: data/com.github.asahnoln.simplooper.in.appdata.xml:6
 msgid "Audio Looper"
 msgstr ""
 
@@ -43,27 +43,27 @@ msgstr ""
 msgid "Overdub"
 msgstr ""
 
-#: data/com.github.asahnoln.audiolooper.in.desktop:4
-msgid "Audio Looper App"
+#: data/com.github.asahnoln.simplooper.in.desktop:3
+msgid "Simplooper"
 msgstr ""
 
-#: data/com.github.asahnoln.audiolooper.in.desktop:5
-msgid "Allows making microphone loops"
+#: data/com.github.asahnoln.simplooper.in.desktop:5
+msgid "Make audio loops"
 msgstr ""
 
-#: data/com.github.asahnoln.audiolooper.in.desktop:8
+#: data/com.github.asahnoln.simplooper.in.desktop:8
 msgid "application-default-icon"
 msgstr ""
 
-#: data/com.github.asahnoln.audiolooper.in.desktop:11
-msgid "Looper;Microphone;"
+#: data/com.github.asahnoln.simplooper.in.desktop:11
+msgid "Looper;Microphone;Audio;Loop;Mic;"
 msgstr ""
 
-#: data/com.github.asahnoln.audiolooper.in.appdata.xml:7
+#: data/com.github.asahnoln.simplooper.in.appdata.xml:7
 msgid "Loop Everything"
 msgstr ""
 
-#: data/com.github.asahnoln.audiolooper.in.appdata.xml:9
+#: data/com.github.asahnoln.simplooper.in.appdata.xml:9
 msgid ""
 "A small looper app which allows to create loops and overdubs with your "
 "microphone."

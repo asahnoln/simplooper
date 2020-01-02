@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Simplooper
+GenericName=Audio Looper
+Comment=Make audio loops
+Categories=Utility;Audio;AudioVideo;
+Exec=com.github.asahnoln.simplooper
+Icon=application-default-icon
+Terminal=false
+Type=application
+Keywords=Looper;Microphone;Audio;Loop;Mic;
+X-GNOME-UsesNotifications=true
