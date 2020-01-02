@@ -2,7 +2,7 @@
 Name=Simplooper
 GenericName=Audio Looper
 Comment=Make audio loops
-Categories=Utility;Audio;AudioVideo;
+Categories=Audio;Utility;Recorder;Music;
 Exec=com.github.asahnoln.simplooper
 Icon=application-default-icon
 Terminal=false
