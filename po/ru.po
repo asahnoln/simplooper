@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.asahnoln.elementary-looper\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-02 04:13+0600\n"
+"POT-Creation-Date: 2020-01-02 21:31+0600\n"
 "PO-Revision-Date: 2018-10-23 04:07+0600\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -18,18 +18,31 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: src/Application.vala:72 data/com.github.asahnoln.audiolooper.in.desktop:3
+#: src/Application.vala:94 data/com.github.asahnoln.audiolooper.in.desktop:3
 #: data/com.github.asahnoln.audiolooper.in.appdata.xml:6
 msgid "Audio Looper"
 msgstr "Аудио Лупер"
 
-#: src/Application.vala:85
+#: src/Application.vala:111 src/Application.vala:173
 msgid "Rec"
-msgstr "Запись"
+msgstr "Записать"
 
-#: src/Application.vala:105
+#: src/Application.vala:126 src/Application.vala:174 src/Application.vala:185
+#: src/Application.vala:191 src/Application.vala:197
 msgid "Stop"
-msgstr "Стоп"
+msgstr "Остановить"
+
+#: src/Application.vala:179 src/Application.vala:184 src/Application.vala:196
+msgid "Play"
+msgstr "Проиграть"
+
+#: src/Application.vala:180
+msgid "Erase"
+msgstr "Стереть"
+
+#: src/Application.vala:190
+msgid "Overdub"
+msgstr "Записать поверх"
 
 #: data/com.github.asahnoln.audiolooper.in.desktop:4
 msgid "Audio Looper App"

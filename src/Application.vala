@@ -17,16 +17,19 @@
 // 
 
 public class Looper : Gtk.Application {
-    enum StateType {
-        STATE_STOPPED,
-        STATE_RECORDING,
-        STATE_PLAYING,
-        STATE_OVERDUBBING
+    protected enum StateType {
+        NO_SONG,
+        STOPPED,
+        RECORDING,
+        PLAYING,
+        OVERDUBBING
     }
-
-    private StateType state { get; set; default = StateType.STATE_STOPPED; }
-    private bool has_song { get; set; default = false; }
-
+    protected StateType[] PrePlayStateType = {
+        StateType.STOPPED,
+        StateType.RECORDING,
+        StateType.OVERDUBBING
+    };
+    protected StateType state { get; set; default = StateType.NO_SONG; }
 
     public Looper () {
         Object(
@@ -39,8 +42,7 @@ public class Looper : Gtk.Application {
         
         // Audio
         
-        /* Initialize GStreamer */
-        //  Gst.gst_init (/*&argc, &argv*/);
+        
         
         /* Build the pipeline */
         //  var pipeline =
@@ -64,6 +66,25 @@ public class Looper : Gtk.Application {
         //  Gst.gst_object_unref (bus);
         //  Gst.gst_element_set_state (pipeline, Gst.GST_STATE_NULL);
         //  Gst.gst_object_unref (pipeline);
+
+        // Build the pipeline:
+        // Gst.Element pipeline;
+        // try {
+        //     pipeline = Gst.parse_launch ("playbin uri=https://www.freedesktop.org/software/gstreamer-sdk/data/media/sintel_trailer-480p.webm");
+        // } catch (Error e) {
+        //     stderr.printf ("Error: %s\n", e.message);
+        //     return;
+        // }
+
+        // // Start playing:
+        // pipeline.set_state (Gst.State.PLAYING);
+
+        // // Wait until error or EOS:
+        // var bus = pipeline.get_bus ();
+        // bus.timed_pop_filtered (Gst.CLOCK_TIME_NONE, Gst.MessageType.ERROR | Gst.MessageType.EOS);
+
+        // // Free resources:
+        // pipeline.set_state (Gst.State.NULL);
 
         // Grid
         var main_window = new Gtk.ApplicationWindow (this);
@@ -90,23 +111,13 @@ public class Looper : Gtk.Application {
         var start_button = new Gtk.Button.with_label (_("Rec"));
         start_button.clicked.connect(() => {
             // Primitive phases
-            state = state == StateType.STATE_RECORDING || state == StateType.STATE_OVERDUBBING
-                ? StateType.STATE_PLAYING 
-                : (state == StateType.STATE_STOPPED 
-                    ? StateType.STATE_RECORDING 
-                    : StateType.STATE_OVERDUBBING
+            state = state in PrePlayStateType
+                ? StateType.PLAYING 
+                : (state == StateType.NO_SONG 
+                    ? StateType.RECORDING 
+                    : StateType.OVERDUBBING
                 ) 
             ;
-
-            debug("Button clicked!");
-
-            debug(state.to_string ());
-
-            statusbar.push (status_context_id, state.to_string ());
-
-
-            // TODO: Record and play sound
-
             // Limit to 5 minutes
             // Save in memory? On disk? 
             // I think it's better to work with current loop in memory and store other loops on disk
@@ -115,40 +126,34 @@ public class Looper : Gtk.Application {
         var stop_button = new Gtk.Button.with_label (_("Stop"));
         stop_button.sensitive = false;
         stop_button.clicked.connect(() => {
-            //start_button.label = _("Play");
-            if (state == StateType.STATE_STOPPED) {
-                has_song = false;
-            }
+            state = state == StateType.STOPPED 
+                ? StateType.NO_SONG // Remove song
+                : StateType.STOPPED // Stop
+            ;
         });
 
-        //  notify.connect((s, p) => {
-        //      debug("Property changed! %s", p.name);
-        //      switch (state) {
-        //          case StateType.STATE_STOPPED:
-        //              if (has_song) {
-        //                  start_button.label = _("Play");
-        //                  stop_button.label = _("Erase");
-        //              } else {
-        //                  start_button.label = _("Rec");
-        //                  stop_button.label = _("Stop");
-        //                  stop_button.sensitive = false;
-        //              }
-        //              break;
-        //          case StateType.STATE_RECORDING:
-        //              start_button.label = _("Play");
-        //              stop_button.label = _("Stop");
-        //              stop_button.sensitive = true;
-        //              has_song = true;
-        //              break;
-        //          case StateType.STATE_PLAYING:
-        //              start_button.label = _("Overdub");
-        //              stop_button.sensitive = true;
-        //              break;
-        //          case StateType.STATE_OVERDUBBING:
-        //              start_button.label = _("Play");
-        //              break;
-        //      }
-        //  });
+        // TODO: Вынести обработку состояний
+        notify["state"].connect((s, p) => {
+            switch (state) {
+                case StateType.NO_SONG:
+                    process_state_no_song (start_button, stop_button);
+                    break;
+                case StateType.STOPPED:
+                    process_state_stopped (start_button, stop_button);
+                    break;
+                case StateType.RECORDING:
+                    process_state_recording (start_button, stop_button);
+                    break;
+                case StateType.PLAYING:
+                    process_state_playing (start_button, stop_button);
+                    break;
+                case StateType.OVERDUBBING:
+                    process_state_overdubbing (start_button, stop_button);
+                    break;
+            }
+
+            statusbar.push (status_context_id, state.to_string ()); 
+        });
 
         // TODO: Change button labels with icons
 
@@ -164,7 +169,37 @@ public class Looper : Gtk.Application {
         main_window.show_all ();
     }
 
+    private void process_state_no_song (Gtk.Button start_button, Gtk.Button stop_button) {
+        start_button.label = _("Rec");
+        stop_button.label = _("Stop");
+        stop_button.sensitive = false;
+    }
+
+    private void process_state_stopped (Gtk.Button start_button, Gtk.Button stop_button) {
+        start_button.label = _("Play");
+        stop_button.label = _("Erase");
+    }
+
+    private void process_state_recording (Gtk.Button start_button, Gtk.Button stop_button) {
+        start_button.label = _("Play");
+        stop_button.label = _("Stop");
+        stop_button.sensitive = true;
+    }
+
+    private void process_state_playing (Gtk.Button start_button, Gtk.Button stop_button) {
+        start_button.label = _("Overdub");
+        stop_button.label = _("Stop");
+        stop_button.sensitive = true;
+    }
+
+    private void process_state_overdubbing (Gtk.Button start_button, Gtk.Button stop_button) {
+        start_button.label = _("Play");
+        stop_button.label = _("Stop");
+    }
+
     public static int main (string[] args) {
+        /* Initialize GStreamer */
+        Gst.init (ref args);
         var app = new Looper ();
         return app.run (args);
     }
