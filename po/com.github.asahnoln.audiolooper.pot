@@ -8,17 +8,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.asahnoln.audiolooper\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-02 03:26+0600\n"
+"POT-Creation-Date: 2020-01-02 04:13+0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/Application.vala:72
-msgid "Looper"
+#: src/Application.vala:72 data/com.github.asahnoln.audiolooper.in.desktop:3
+#: data/com.github.asahnoln.audiolooper.in.appdata.xml:6
+msgid "Audio Looper"
 msgstr ""
 
 #: src/Application.vala:85
@@ -27,11 +28,6 @@ msgstr ""
 
 #: src/Application.vala:105
 msgid "Stop"
-msgstr ""
-
-#: data/com.github.asahnoln.audiolooper.in.desktop:3
-#: data/com.github.asahnoln.audiolooper.in.appdata.xml:6
-msgid "Audio Looper"
 msgstr ""
 
 #: data/com.github.asahnoln.audiolooper.in.desktop:4

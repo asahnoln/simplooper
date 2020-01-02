@@ -7,41 +7,37 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.asahnoln.elementary-looper\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-02 03:26+0600\n"
+"POT-Creation-Date: 2020-01-02 04:13+0600\n"
 "PO-Revision-Date: 2018-10-23 04:07+0600\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ASCII\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: src/Application.vala:72
-msgid "Looper"
-msgstr ""
+#: src/Application.vala:72 data/com.github.asahnoln.audiolooper.in.desktop:3
+#: data/com.github.asahnoln.audiolooper.in.appdata.xml:6
+msgid "Audio Looper"
+msgstr "Аудио Лупер"
 
 #: src/Application.vala:85
 msgid "Rec"
-msgstr ""
+msgstr "Запись"
 
 #: src/Application.vala:105
 msgid "Stop"
-msgstr ""
-
-#: data/com.github.asahnoln.audiolooper.in.desktop:3
-#: data/com.github.asahnoln.audiolooper.in.appdata.xml:6
-msgid "Audio Looper"
-msgstr ""
+msgstr "Стоп"
 
 #: data/com.github.asahnoln.audiolooper.in.desktop:4
 msgid "Audio Looper App"
-msgstr ""
+msgstr "Приложение Аудио Лупер"
 
 #: data/com.github.asahnoln.audiolooper.in.desktop:5
 msgid "Allows making microphone loops"
-msgstr ""
+msgstr "Позволяет делать микрофонные петли"
 
 #: data/com.github.asahnoln.audiolooper.in.desktop:8
 msgid "application-default-icon"
@@ -53,10 +49,12 @@ msgstr ""
 
 #: data/com.github.asahnoln.audiolooper.in.appdata.xml:7
 msgid "Loop Everything"
-msgstr ""
+msgstr "Петляйте всё"
 
 #: data/com.github.asahnoln.audiolooper.in.appdata.xml:9
 msgid ""
 "A small looper app which allows to create loops and overdubs with your "
 "microphone."
 msgstr ""
+"Небольшое приложение-лупер позволяющее создавать петли и перезаписывать их с "
+"помощью микрофона."

@@ -10,7 +10,7 @@ executable(
     dependencies: [
         dependency('gtk+-3.0')
     ],
-    install: true,
+    install: true
 )
 
 i18n.merge_file(

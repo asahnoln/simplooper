@@ -17,15 +17,16 @@
 // 
 
 public class Looper : Gtk.Application {
-    private ushort state { get; set; default = 0; }
-    private bool has_song { get; set; default = false; }
-
     enum StateType {
         STATE_STOPPED,
         STATE_RECORDING,
         STATE_PLAYING,
         STATE_OVERDUBBING
     }
+
+    private StateType state { get; set; default = StateType.STATE_STOPPED; }
+    private bool has_song { get; set; default = false; }
+
 
     public Looper () {
         Object(
@@ -69,7 +70,7 @@ public class Looper : Gtk.Application {
 
         main_window.default_width = 200;
         main_window.default_height = 200;
-        main_window.title = _("Looper");
+        main_window.title = _("Audio Looper");
 
         // TODO: Loops storage
 
@@ -77,6 +78,10 @@ public class Looper : Gtk.Application {
         //  grid.orientation = Gtk.Orientation.HORIZONTAL;
         layout.column_spacing = 6;
         layout.row_spacing = 6;
+
+        // TODO: Add STATUS indicator
+        var statusbar = new Gtk.Statusbar ();
+        var status_context_id = statusbar.get_context_id ("all");
         
         // Button labels mean COMMANDS to do, not STATES
         // Arguable?
@@ -86,13 +91,18 @@ public class Looper : Gtk.Application {
         start_button.clicked.connect(() => {
             // Primitive phases
             state = state == StateType.STATE_RECORDING || state == StateType.STATE_OVERDUBBING
-                ? StateType.STATE_PLAYING // Record sound
-                : StateType.STATE_OVERDUBBING // Play sound
+                ? StateType.STATE_PLAYING 
+                : (state == StateType.STATE_STOPPED 
+                    ? StateType.STATE_RECORDING 
+                    : StateType.STATE_OVERDUBBING
+                ) 
             ;
 
             debug("Button clicked!");
 
             debug(state.to_string ());
+
+            statusbar.push (status_context_id, state.to_string ());
 
 
             // TODO: Record and play sound
@@ -140,7 +150,6 @@ public class Looper : Gtk.Application {
         //      }
         //  });
 
-        // TODO: Add STATUS indicator
         // TODO: Change button labels with icons
 
         //  start_button.margin = 12;
@@ -148,6 +157,8 @@ public class Looper : Gtk.Application {
 
         layout.attach (stop_button, 0, 0, 1, 1);
         layout.attach_next_to (start_button, stop_button, Gtk.PositionType.RIGHT, 1, 1);
+
+        layout.attach (statusbar, 0, 1, 1, 1);
 
         main_window.add (layout);
         main_window.show_all ();
