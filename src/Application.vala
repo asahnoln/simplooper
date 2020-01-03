@@ -33,9 +33,10 @@ public class Looper : Gtk.Application {
     
     protected StateType state { get; set; default = StateType.NO_SONG; }
     
-    protected Gst.Element source;
-    protected Gst.Element sink;
-    protected Gst.Pipeline pipeline;
+    // protected Gst.Element source;
+    // protected Gst.Element sink;
+    protected Gst.Pipeline pipeline_recording;
+    protected Gst.Element pipeline_playing;
     
 
     // Thanks to reco
@@ -55,7 +56,7 @@ public class Looper : Gtk.Application {
     protected string tmp_full_path {
         get {
             if (_tmp_full_path == null) {
-                _tmp_full_path = Environment.get_tmp_dir () + "/%s%s".printf (tmp_filename, ".wav");
+                _tmp_full_path = Environment.get_tmp_dir () + "/%s-%d%s".printf (tmp_filename, tmp_files_count, ".wav");
             }
             debug (_tmp_full_path);
             return _tmp_full_path;
@@ -64,6 +65,8 @@ public class Looper : Gtk.Application {
             _tmp_full_path = value;
         }
     }
+
+    protected ushort tmp_files_count = 0; 
 
     public Looper () {
         Object(
@@ -168,7 +171,7 @@ public class Looper : Gtk.Application {
         stop_button.label = _("Erase");
 
         stop_recording ();
-        // stop_playing ();
+        stop_playing ();
     }
 
     private void process_state_recording (Gtk.Button start_button, Gtk.Button stop_button) {
@@ -192,103 +195,92 @@ public class Looper : Gtk.Application {
         start_button.label = _("Play");
         stop_button.label = _("Stop");
 
-        stop_playing ();
         start_recording ();
     }
 
     private void start_recording () {
-        source = Gst.ElementFactory.make ("autoaudiosrc", "source");
-        sink = Gst.ElementFactory.make ("filesink", "sink");
-        pipeline = new Gst.Pipeline ("record-pipeline");
+        var source = Gst.ElementFactory.make ("autoaudiosrc", "source");
         var encoder = Gst.ElementFactory.make ("wavenc", "encoder");
+        var sink = Gst.ElementFactory.make ("filesink", "sink");
+        pipeline_recording = new Gst.Pipeline ("record-pipeline");
 
-        if (source == null || sink == null || pipeline == null || encoder == null) {
+        if (sink == null || pipeline_recording == null || encoder == null) {
             stderr.puts ("Not all elements could be created.\n");
             return;
         }
 
+        ++tmp_files_count;
         sink.set ("location", tmp_full_path);
 
-        pipeline.add_many (encoder, sink, source);
-
-        if (source.link (encoder) != true) {
-            stderr.puts ("Source could not be linked to encoder.\n");
-            return;
-        }
+        pipeline_recording.add_many (encoder, sink);
 
         if (encoder.link (sink) != true) {
             stderr.puts ("Encoder could not be linked to sink.\n");
             return;
         }
 
-        // Start playing:
-        Gst.StateChangeReturn ret = pipeline.set_state (Gst.State.PLAYING);
+        pipeline_recording.add_many (source);
+        if (source.link (encoder) != true) {
+            stderr.puts ("Source could not be linked to encoder.\n");
+            return;
+        }
+
+        Gst.StateChangeReturn ret = pipeline_recording.set_state (Gst.State.PLAYING);
         if (ret == Gst.StateChangeReturn.FAILURE) {
             stderr.puts ("Unable to set the pipeline to the playing state.\n");
             return;
         }
 
-        // Wait until error or EOS:
-        // Gst.Bus bus = pipeline.get_bus ();
-        // Gst.Message msg = bus.timed_pop_filtered (Gst.CLOCK_TIME_NONE, Gst.MessageType.ERROR | Gst.MessageType.EOS);
+        var bus = pipeline_recording.get_bus ();
+        bus.add_watch (0, (bus, message) => {
+            // debug (message.type.to_string ());
+            switch (message.type) {
+                case Gst.MessageType.ERROR:
+                    GLib.Error err;
+                    string debug_info;
 
-        // // Parse message:
-        // if (msg != null) {
-        //     switch (msg.type) {
-        //     case Gst.MessageType.ERROR:
-        //         GLib.Error err;
-        //         string debug_info;
+                    message.parse_error (out err, out debug_info);
+                    stderr.printf ("Error received from element %s: %s\n", message.src.name, err.message);
+                    stderr.printf ("Debugging information: %s\n", (debug_info != null)? debug_info : "none");
+                    break;
 
-        //         msg.parse_error (out err, out debug_info);
-        //         stderr.printf ("Error received from element %s: %s\n", msg.src.name, err.message);
-        //         stderr.printf ("Debugging information: %s\n", (debug_info != null)? debug_info : "none");
-        //         break;
-
-        //     case Gst.MessageType.EOS:
-        //         print ("End-Of-Stream reached.\n");
-        //         break;
-
-        //     default:
-        //         // We should not reach here because we only asked for ERRORs and EOS:
-        //         assert_not_reached ();
-        //     }
-        // }
+                case Gst.MessageType.EOS:
+                    print ("End-Of-Stream reached.\n");
+                    break;
+            }
+            return true;
+        });
+        bus.enable_sync_message_emission();
     }
 
     private void stop_recording () {
-        // Free resources: 
-        pipeline.set_state (Gst.State.NULL);
+        pipeline_recording.set_state (Gst.State.NULL);
     }
 
     private void start_playing() {
-        source = Gst.ElementFactory.make ("filesrc", "source");
-        sink = Gst.ElementFactory.make ("autoaudiosink", "sink");
-        pipeline = new Gst.Pipeline ("play-pipeline");
-
-        if (source == null || sink == null || pipeline == null) {
-            stderr.puts ("Not all elements could be created.\n");
+        try {
+            pipeline_playing = Gst.parse_launch (@"playbin uri=file://$tmp_full_path");
+        } catch (Error e) {
+            stderr.printf ("Error: %s\n", e.message);
             return;
         }
 
-        source.set ("location", tmp_full_path);
+        var bus = pipeline_playing.get_bus ();
+        bus.add_watch (0, (bus, message) => {
+            if (message.type == Gst.MessageType.EOS) {
+                debug ("EOS!!");
+                pipeline_playing.set_state (Gst.State.NULL);
+                pipeline_playing.set_state (Gst.State.PLAYING);
+            }
+            return true;
+        });
+        bus.enable_sync_message_emission();
 
-        pipeline.add_many (source, sink);
-
-        if (source.link (sink) != true) {
-            stderr.puts ("Elements could not be linked.\n");
-            return;
-        }
-
-        // Start playing:
-        Gst.StateChangeReturn ret = pipeline.set_state (Gst.State.PLAYING);
-        if (ret == Gst.StateChangeReturn.FAILURE) {
-            stderr.puts ("Unable to set the pipeline to the playing state.\n");
-            return;
-        }
+        pipeline_playing.set_state (Gst.State.PLAYING);
     }
 
     private void stop_playing() {
-        pipeline.set_state (Gst.State.NULL);
+        pipeline_playing.set_state (Gst.State.NULL);
     }
 
     public static int main (string[] args) {
