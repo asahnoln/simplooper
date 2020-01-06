@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with looper.  If not, see <http://www.gnu.org/licenses/>.
 // 
+using Gee;
 
 public class Looper : Gtk.Application {
     protected enum StateType {
@@ -33,15 +34,12 @@ public class Looper : Gtk.Application {
     
     protected StateType state { get; set; default = StateType.NO_SONG; }
     
-    // protected Gst.Element source;
-    // protected Gst.Element sink;
-    protected Gst.Pipeline pipeline_recording;
-    protected Gst.Element pipeline_playing;
+    protected Gst.Pipeline recording_pipeline;
+    protected ArrayList<Gst.Element> playing_pipelines;
     
 
     // Thanks to reco
     private string _tmp_filename;
-    private string _tmp_full_path;
     protected string tmp_filename { 
         get {
             if (_tmp_filename == null) {
@@ -53,26 +51,16 @@ public class Looper : Gtk.Application {
             _tmp_filename = value;
         }
     }
-    protected string tmp_full_path {
-        get {
-            if (_tmp_full_path == null) {
-                _tmp_full_path = Environment.get_tmp_dir () + "/%s-%d%s".printf (tmp_filename, tmp_files_count, ".wav");
-            }
-            debug (_tmp_full_path);
-            return _tmp_full_path;
-        }
-        set {
-            _tmp_full_path = value;
-        }
-    }
 
-    protected ushort tmp_files_count = 0; 
+    protected ushort layers = 0; 
 
     public Looper () {
         Object(
             application_id: "com.github.asahnoln.simplooper",
             flags: ApplicationFlags.FLAGS_NONE
         );
+
+        playing_pipelines = new ArrayList<Gst.Element> ();
     }
 
     protected override void activate () {
@@ -202,38 +190,36 @@ public class Looper : Gtk.Application {
         var source = Gst.ElementFactory.make ("autoaudiosrc", "source");
         var encoder = Gst.ElementFactory.make ("wavenc", "encoder");
         var sink = Gst.ElementFactory.make ("filesink", "sink");
-        pipeline_recording = new Gst.Pipeline ("record-pipeline");
+        recording_pipeline = new Gst.Pipeline ("record-pipeline");
 
-        if (sink == null || pipeline_recording == null || encoder == null) {
+        if (sink == null || recording_pipeline == null || encoder == null) {
             stderr.puts ("Not all elements could be created.\n");
             return;
         }
 
-        ++tmp_files_count;
-        sink.set ("location", tmp_full_path);
+        sink.set ("location", get_tmp_full_path (++layers));
 
-        pipeline_recording.add_many (encoder, sink);
+        recording_pipeline.add_many (encoder, sink);
 
         if (encoder.link (sink) != true) {
             stderr.puts ("Encoder could not be linked to sink.\n");
             return;
         }
 
-        pipeline_recording.add_many (source);
+        recording_pipeline.add_many (source);
         if (source.link (encoder) != true) {
             stderr.puts ("Source could not be linked to encoder.\n");
             return;
         }
 
-        Gst.StateChangeReturn ret = pipeline_recording.set_state (Gst.State.PLAYING);
+        Gst.StateChangeReturn ret = recording_pipeline.set_state (Gst.State.PLAYING);
         if (ret == Gst.StateChangeReturn.FAILURE) {
             stderr.puts ("Unable to set the pipeline to the playing state.\n");
             return;
         }
 
-        var bus = pipeline_recording.get_bus ();
+        var bus = recording_pipeline.get_bus ();
         bus.add_watch (0, (bus, message) => {
-            // debug (message.type.to_string ());
             switch (message.type) {
                 case Gst.MessageType.ERROR:
                     GLib.Error err;
@@ -254,33 +240,58 @@ public class Looper : Gtk.Application {
     }
 
     private void stop_recording () {
-        pipeline_recording.set_state (Gst.State.NULL);
+        recording_pipeline.set_state (Gst.State.NULL);
     }
 
     private void start_playing() {
-        try {
-            pipeline_playing = Gst.parse_launch (@"playbin uri=file://$tmp_full_path");
-        } catch (Error e) {
-            stderr.printf ("Error: %s\n", e.message);
-            return;
+        foreach (var playing_pipeline in playing_pipelines) {
+            playing_pipeline.set_state (Gst.State.PLAYING);
         }
 
-        var bus = pipeline_playing.get_bus ();
-        bus.add_watch (0, (bus, message) => {
-            if (message.type == Gst.MessageType.EOS) {
-                debug ("EOS!!");
-                pipeline_playing.set_state (Gst.State.NULL);
-                pipeline_playing.set_state (Gst.State.PLAYING);
+        if (playing_pipelines.size < layers) {
+            Gst.Element playing_pipeline;
+            try {
+                playing_pipeline = Gst.parse_launch ("playbin uri=file://" + get_tmp_full_path (layers));
+            } catch (Error e) {
+                stderr.printf ("Error: %s\n", e.message);
+                return;
             }
-            return true;
-        });
-        bus.enable_sync_message_emission();
 
-        pipeline_playing.set_state (Gst.State.PLAYING);
+            playing_pipelines.add (playing_pipeline);
+
+            var bus = playing_pipeline.get_bus ();
+            bus.add_watch (0, (bus, message) => {
+                switch (message.type) {
+                    case Gst.MessageType.ERROR:
+                        GLib.Error err;
+                        string debug_info;
+
+                        message.parse_error (out err, out debug_info);
+                        stderr.printf ("Error received from element %s: %s\n", message.src.name, err.message);
+                        stderr.printf ("Debugging information: %s\n", (debug_info != null)? debug_info : "none");
+                        break;
+
+                    case Gst.MessageType.EOS:
+                        playing_pipeline.set_state (Gst.State.NULL);
+                        playing_pipeline.set_state (Gst.State.PLAYING);
+                        break;
+                }
+                return true;
+            });
+            bus.enable_sync_message_emission();
+
+            playing_pipeline.set_state (Gst.State.PLAYING);
+        }
     }
 
     private void stop_playing() {
-        pipeline_playing.set_state (Gst.State.NULL);
+        foreach (var playing_pipeline in playing_pipelines) {
+            playing_pipeline.set_state (Gst.State.NULL);
+        }
+    }
+
+    private string get_tmp_full_path(ushort layer) {
+        return Environment.get_tmp_dir () + "/%s-%d%s".printf (tmp_filename, layer, ".wav");
     }
 
     public static int main (string[] args) {

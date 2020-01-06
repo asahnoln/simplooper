@@ -9,6 +9,7 @@ executable(
     'src/Application.vala',
     dependencies: [
         dependency('gtk+-3.0'),
+        dependency('gee-0.8'),
         dependency('gstreamer-1.0')
     ],
     install: true
