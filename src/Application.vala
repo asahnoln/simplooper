@@ -18,6 +18,9 @@
 using Gee;
 
 public class Looper : Gtk.Application {
+    Gtk.Button start_button;
+    Gtk.Button stop_button;
+
     protected enum StateType {
         NO_SONG,
         STOPPED,
@@ -36,7 +39,6 @@ public class Looper : Gtk.Application {
     
     protected Gst.Pipeline recording_pipeline;
     protected ArrayList<Gst.Element> playing_pipelines;
-    
 
     // Thanks to reco
     private string _tmp_filename;
@@ -52,7 +54,9 @@ public class Looper : Gtk.Application {
         }
     }
 
-    protected ushort layers = 0; 
+    protected uint layers = 0; 
+
+    protected int64 duration = 0;
 
     public Looper () {
         Object(
@@ -87,7 +91,7 @@ public class Looper : Gtk.Application {
         // Arguable?
         
 
-        var start_button = new Gtk.Button.with_label (_("Rec"));
+        start_button = new Gtk.Button.with_label (_("Rec"));
         start_button.clicked.connect(() => {
             // Primitive phases
             state = state in PrePlayStateType
@@ -102,7 +106,7 @@ public class Looper : Gtk.Application {
             // I think it's better to work with current loop in memory and store other loops on disk
         });
 
-        var stop_button = new Gtk.Button.with_label (_("Stop"));
+        stop_button = new Gtk.Button.with_label (_("Stop"));
         stop_button.sensitive = false;
         stop_button.clicked.connect(() => {
             state = state == StateType.STOPPED 
@@ -240,11 +244,24 @@ public class Looper : Gtk.Application {
     }
 
     private void stop_recording () {
-        recording_pipeline.set_state (Gst.State.NULL);
+        if (playing_pipelines.size == 0) {
+            recording_pipeline.set_state (Gst.State.NULL);
+        } else {
+            var playing_pipeline = playing_pipelines.get(0);
+            var bus = playing_pipeline.get_bus ();
+            bus.add_watch (0, (bus, message) => {
+                if (message.type == Gst.MessageType.EOS) {
+                    recording_pipeline.set_state (Gst.State.NULL);
+                    return false;
+                }
+                return true;
+            });
+        }
     }
 
     private void start_playing() {
         foreach (var playing_pipeline in playing_pipelines) {
+            // TODO: Offset
             playing_pipeline.set_state (Gst.State.PLAYING);
         }
 
@@ -259,8 +276,11 @@ public class Looper : Gtk.Application {
 
             playing_pipelines.add (playing_pipeline);
 
+            playing_pipeline.query_duration (Gst.Format.TIME, out duration);
+
             var bus = playing_pipeline.get_bus ();
             bus.add_watch (0, (bus, message) => {
+                debug (message.type.to_string ());
                 switch (message.type) {
                     case Gst.MessageType.ERROR:
                         GLib.Error err;
@@ -290,8 +310,8 @@ public class Looper : Gtk.Application {
         }
     }
 
-    private string get_tmp_full_path(ushort layer) {
-        return Environment.get_tmp_dir () + "/%s-%d%s".printf (tmp_filename, layer, ".wav");
+    private string get_tmp_full_path(uint layer) {
+        return Environment.get_tmp_dir () + "/%s-%u%s".printf (tmp_filename, layer, ".wav");
     }
 
     public static int main (string[] args) {
